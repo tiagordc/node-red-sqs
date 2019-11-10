@@ -1,0 +1,26 @@
+{
+  "name": "node-red-sqs",
+  "version": "0.0.2",
+  "description": "Node-RED interfacing with AWS SQS",
+  "main": "index.js",
+  "private": true,
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tiagordc/node-red-sqs.git"
+  },
+  "keywords": [
+    "node-red",
+    "aws",
+    "sqs"
+  ],
+  "author": "Tiago Costa",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tiagordc/node-red-sqs/issues"
+  },
+  "homepage": "https://github.com/tiagordc/node-red-sqs#readme",
+  "dependencies": {
+    "aws-sdk": "^2.567.0"
+  }
+}
