@@ -24,7 +24,8 @@ worker.test({ payload: "Hello World!", _msgid: (1 + Math.random() * 4294967295).
 
 ## ENV
 
-AWS_ACCESS_KEY_ID": ""
-AWS_SECRET_ACCESS_KEY": ""
-AWS_FLOW_SQS": "AWS SQS FIFO QUEUE"
-AWS_FLOW_S3": "AWS S3 BUCKET"
+AWS_ACCESS_KEY_ID": ""\
+AWS_SECRET_ACCESS_KEY": ""\
+AWS_FLOW_SQS": "AWS SQS FIFO QUEUE"\
+AWS_FLOW_S3": "AWS S3 BUCKET"\
+
