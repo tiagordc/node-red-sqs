@@ -81,10 +81,10 @@ class Worker {
 
         var that = this;
 
-        var msgParts = msg.Body.match(/(.+)\/(.+)\/(.+?)\.(.+)\.json/);
+        var msgParts = msg.Body.match(/(.+)\/(.+)\/([\d\-T:.]+Z)\.(.+)\.json/);
         var fromId = msgParts[1];
         var toId = msgParts[2];
-        var unixDate = msgParts[3];
+        //var sendDate = msgParts[3];
 
         var s3Params = {
             Bucket: this.bucket,
@@ -97,7 +97,8 @@ class Worker {
             } else {
 
                 var msgBody = JSON.parse(data.Body.toString());
-                msgBody._msginfo = { from: fromId, to: toId, date: unixDate };
+                msgBody._msginfo = { from: fromId, to: toId };
+                //msgBody._msginfo.sent = sendDate;
 
                 var sqsParams = {
                     QueueUrl: that.options.url,
@@ -109,6 +110,11 @@ class Worker {
                     if (err) {
                         that.log.error(err);
                     } else {
+
+                        // var now = new Date();
+                        // msgBody._msginfo.received = now.toISOString();
+                        // msgBody._msginfo.delay = now - (new Date(msgBody._msginfo.sent));
+
                         try {
                             that.callback(msgBody);
                         }
@@ -134,8 +140,8 @@ class Worker {
             if (!from || !to || !msg || !msg._msgid) reject();
             else {
 
-                var unixNow = + new Date();
-                var filePath = `${from.id}/${to.id}/${unixNow}.${msg._msgid}.json`;
+                var dateNow = (new Date()).toISOString();
+                var filePath = `${from.id}/${to.id}/${dateNow}.${msg._msgid}.json`;
 
                 var s3Params = {
                     Bucket: that.bucket,
