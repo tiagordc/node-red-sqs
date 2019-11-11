@@ -25,7 +25,6 @@ class Worker {
         if (typeof callback !== 'function') return;
         if (this.callback) return;
         this.callback = callback;
-        this.parallel = this.options.parallel || 1;
         this.receiving = 0;
         this.checkMessages();
     }
@@ -50,9 +49,9 @@ class Worker {
 
         var params = {
             QueueUrl: queue,
-            MaxNumberOfMessages: Math.min(this.parallel, 10),
+            MaxNumberOfMessages: 10,
             VisibilityTimeout: timeout,
-            WaitTimeSeconds: 20,
+            WaitTimeSeconds: 10,
             AttributeNames: attributes
         };
 
@@ -81,10 +80,11 @@ class Worker {
 
         var that = this;
 
-        var msgParts = msg.Body.match(/(.+)\/(.+)\/([\d\-T:.]+Z)\.(.+)\.json/);
-        var fromId = msgParts[1];
-        var toId = msgParts[2];
-        //var sendDate = msgParts[3];
+        var msgParts = msg.Body.match(/(.+)\/(.+)\/(.+)\/([\d\-T:.]+Z)\.(.+)\.json/);
+        var flowId = msgParts[1];
+        var fromId = msgParts[2];
+        var toId = msgParts[3];
+        //var sendDate = msgParts[4];
 
         var s3Params = {
             Bucket: this.bucket,
@@ -97,7 +97,7 @@ class Worker {
             } else {
 
                 var msgBody = JSON.parse(data.Body.toString());
-                msgBody._msginfo = { from: fromId, to: toId };
+                msgBody._msginfo = { flow: flowId, from: fromId, to: toId };
                 //msgBody._msginfo.sent = sendDate;
 
                 var sqsParams = {
@@ -141,7 +141,7 @@ class Worker {
             else {
 
                 var dateNow = (new Date()).toISOString();
-                var filePath = `${from.id}/${to.id}/${dateNow}.${msg._msgid}.json`;
+                var filePath = `${from._flow.id}/${from.id}/${to.id}/${dateNow}.${msg._msgid}.json`;
 
                 var s3Params = {
                     Bucket: that.bucket,
@@ -158,8 +158,8 @@ class Worker {
                         var sqsParams = {
                             QueueUrl: that.url,
                             MessageBody: filePath,
-                            MessageDeduplicationId: msg._msgid,
-                            MessageGroupId: msg._msgid
+                            MessageDeduplicationId: (1 + Math.random() * 4294967295).toString(16),
+                            MessageGroupId: from._flow.id
                         };
 
                         that.client.sendMessage(sqsParams, function (err, data) {

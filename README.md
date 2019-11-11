@@ -20,7 +20,7 @@ function start() {
     return ...
     .then(function() {
         return sqs.init(function(msg) {
-            if (msg._msginfo) {
+            if (msg && msg._msginfo) {
                 var node = redNodes.getNode(msg._msginfo.to);
                 if (node) {
                     delete msg._msginfo;
