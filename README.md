@@ -2,30 +2,51 @@
 
 Node-RED interfacing with AWS SQS
 
-**This is a plugin to Node-RED that requires customization of the runtime**
+**This is a plugin to Node-RED that requires customization of the runtime, see changes below**
 
-With this plugin each message passes through Amazon Simple Queue Service (SQS) brefore processing. 
+With this plugin each message passes through Amazon Simple Queue Service (SQS) and S3 allowing Node-RED load balancing and flow replay. 
 
-## SQS worker 
+## Node-RED changes
 
-This is the process that handles messages through an AWS SQS queue and S3 bucket to allow Node-RED load balancing and replay
+packages > node_modules > @node-red > runtime > lib > index.js
 
 ```javascript
 
-const worker = new Worker({ url: "FIFO SQS URL", bucket: "S3 BUCKET" });
+var sqs = require("node-red-sqs");
 
-worker.start((msg) => {
-    console.log(msg);
-});
+...
 
-worker.test({ payload: "Hello World!", _msgid: (1 + Math.random() * 4294967295).toString(16) });
+function start() {
+    return ...
+    .then(function() {
+        return sqs.init(function(msg) {
+            var node = redNodes.getNode(msg._msginfo.to);
+            if (node) node.receive(msg);
+        });
+    });
+
+}
 
 ```
 
-## ENV
+packages > node_modules > @node-red > runtime > lib > nodes > Node.js
 
-AWS_ACCESS_KEY_ID": ""\
-AWS_SECRET_ACCESS_KEY": ""\
-AWS_FLOW_SQS": "AWS SQS FIFO QUEUE"\
-AWS_FLOW_S3": "AWS S3 BUCKET"
+```javascript
+
+var sqs = require("node-red-sqs");
+
+...
+
+Node.prototype.send = function(msg) {   
+    sqs.send.call(this, msg);
+}
+
+```
+
+## Required ENV variables
+
+AWS_ACCESS_KEY_ID": "ACCESS ID"\
+AWS_SECRET_ACCESS_KEY": "ACCESS KEY"\
+AWS_FLOW_SQS": "SQS FIFO QUEUE URL"\
+AWS_FLOW_S3": "AWS S3 BUCKET NAME"
 
