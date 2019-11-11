@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/tiagordc/node-red-sqs#readme",
   "dependencies": {
-    "aws-sdk": "^2.567.0"
+    "aws-sdk": "^2.567.0",
+    "clone": "2.1.2"
   }
 }

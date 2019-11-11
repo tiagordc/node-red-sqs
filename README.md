@@ -20,8 +20,13 @@ function start() {
     return ...
     .then(function() {
         return sqs.init(function(msg) {
-            var node = redNodes.getNode(msg._msginfo.to);
-            if (node) node.receive(msg);
+            if (msg._msginfo) {
+                var node = redNodes.getNode(msg._msginfo.to);
+                if (node) {
+                    delete msg._msginfo;
+                    node.receive(msg);
+                }
+            }
         });
     });
 
