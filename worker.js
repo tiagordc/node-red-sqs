@@ -171,45 +171,6 @@ class Worker {
 
     }
 
-    test(msg) {
-
-        var queue = this.options.url;
-        var id = msg._msgid;
-        var file = `${id}.json`;
-        var that = this;
-
-        var s3Params = {
-            Bucket: this.bucket,
-            ContentType: 'application/json; charset=utf-8',
-            Key: file,
-            Body: JSON.stringify(msg)
-        };
-
-        this.storage.upload(s3Params, function(err, data) {
-            if (err) {
-                console.log("Error", err);
-            } else {
-
-                var sqsParams = {
-                    QueueUrl: queue,
-                    MessageBody: file,
-                    MessageDeduplicationId: id,
-                    MessageGroupId: id
-                };
-        
-                that.client.sendMessage(sqsParams, function (err, data) {
-                    if (err) {
-                        console.log("Error", err);
-                    } else {
-                        console.log("Success", data.MessageId);
-                    }
-                });
-
-            }
-        });
-
-    }
-
 }
 
 module.exports = Worker;
