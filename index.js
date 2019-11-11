@@ -33,8 +33,12 @@ function cloneMessage(msg) {
 
 module.exports = {
 
-    init: function() {
-
+    init: function(cb) {
+        return new Promise(function (resolve, reject) {
+            var worker = new Worker({ url: process.env.AWS_FLOW_SQS, bucket: process.env.AWS_FLOW_S3 });
+            worker.start(cb);
+            resolve();
+        });
     },
     
     send: function (msg) {
@@ -139,21 +143,6 @@ module.exports = {
             //ev.n.receive(ev.m);
 
         }
-
-    },
-
-    receive: function (msg) {
-
-        if (!msg) {
-            msg = {};
-        }
-
-        if (!msg._msgid) {
-            msg._msgid = generateId();
-        }
-
-        this.metric("receive",msg);
-        this.emit("input",msg);
 
     }
 

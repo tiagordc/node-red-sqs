@@ -81,6 +81,11 @@ class Worker {
 
         var that = this;
 
+        var msgParts = msg.Body.match(/(.+)\/(.+)\/(.+?)\.(.+)\.json/);
+        var fromId = msgParts[1];
+        var toId = msgParts[2];
+        var unixDate = msgParts[3];
+
         var s3Params = {
             Bucket: this.bucket,
             Key: msg.Body
@@ -92,6 +97,7 @@ class Worker {
             } else {
 
                 var msgBody = JSON.parse(data.Body.toString());
+                msgBody._msginfo = { from: fromId, to: toId, date: unixDate };
 
                 var sqsParams = {
                     QueueUrl: that.options.url,
@@ -132,13 +138,13 @@ class Worker {
                 var filePath = `${from.id}/${to.id}/${unixNow}.${msg._msgid}.json`;
 
                 var s3Params = {
-                    Bucket: this.bucket,
+                    Bucket: that.bucket,
                     ContentType: 'application/json; charset=utf-8',
                     Key: filePath,
                     Body: JSON.stringify(msg)
                 };
 
-                this.storage.upload(s3Params, function (err, data) {
+                that.storage.upload(s3Params, function (err, data) {
 
                     if (err) reject(err);
                     else {
