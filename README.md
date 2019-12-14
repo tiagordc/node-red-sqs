@@ -1,12 +1,12 @@
 # node-red-sqs
 
-Node-RED interfacing with AWS SQS
-
-**This is a plugin to Node-RED that requires customization of the runtime, see changes below**
-
 With this plugin each message passes through Amazon Simple Queue Service (SQS) and S3 allowing Node-RED load balancing and flow replay. 
 
-## Node-RED changes
+**Messages will no longer be real-time!**
+
+To use this download the sources or clone this repo.
+
+## Node-RED runtime changes
 
 packages > node_modules > @node-red > runtime > lib > index.js
 
